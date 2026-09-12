@@ -1,14 +1,19 @@
-# NezukoClang — clang 24.0.0git for Android kernel builds
+# NezukoClang — clang 23.1.1 for Android kernel builds
 
 ```
-NezukoClang clang version 24.0.0git
+NezukoClang clang version 23.1.1
 Target: x86_64-unknown-linux-gnu
 ```
 
-Kernel-focused LLVM toolchain (built from `llvm/llvm-project` main):
-`clang` + `lld` + `polly`, targets `AArch64` + `ARM`.
+Kernel-focused LLVM toolchain (built from `llvm/llvm-project` release/23.x):
+`clang` + `lld` + `polly`, targets `AArch64` + `ARM` + `X86`.
 Branding keeps the `clang version` substring so Kbuild compiler
 detection (`cc-name`) keeps working.
+
+PGO/LTO support: `llvm-profdata`, `llvm-cov`, and the compiler-rt
+profile + builtins runtimes (`lib/clang/23/lib/...`) are included.
+Tested: host PGO cycle (instrument → run → merge → `-fprofile-use`)
+and miatoll full-LTO (`CONFIG_LTO_CLANG=y`) kernel build — both OK.
 
 ## Tested
 
@@ -35,4 +40,4 @@ accordingly.
 ## Reproduce
 
 See `build-nezuko-clang.sh` (bootstrap needs a host clang + lld).
-Source commit: llvm-project main `5eff11f8e`.
+Source commit: llvm-project release tag `llvmorg-23.1.1` (stable).
