@@ -26,6 +26,10 @@ Mods:
   (https://clang.llvm.org/docs/ClangRepl.html).
 - Full binutils set: `llvm-ar/nm/objcopy/objdump/readelf/readobj/strip/
   addr2line/size/strings/symbolizer`, plus `clang-format`.
+- Host runtimes: OpenMP (`libomp`, `-fopenmp` tested with 4 threads),
+  ASan/UBSan (`-fsanitize=address,undefined`; UBSan verified catching
+  shift-overflow; ASan links+runs — full reports need a host that
+  allows shadow-memory mapping).
 - Bundled GCC 4.9 pair (`aarch64-linux-android-4.9/`,
   `arm-linux-androideabi-4.9/`) — the proven combo for 4.14 kernel
   builds (64-bit via clang, 32-bit compat via `CROSS_COMPILE_ARM32`).
