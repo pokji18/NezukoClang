@@ -15,6 +15,22 @@ profile + builtins runtimes (`lib/clang/23/lib/...`) are included.
 Tested: host PGO cycle (instrument → run → merge → `-fprofile-use`)
 and miatoll full-LTO (`CONFIG_LTO_CLANG=y`) kernel build — both OK.
 
+Mods:
+- GNU cross-prefix wrappers (`aarch64-linux-gnu-*`, `arm-linux-gnueabi-*`
+  for gcc/g++/cc/c++/as/ld/ar/nm/objcopy/objdump/readelf/strip/addr2line/
+  size/strings) — freestanding/kernel-oriented, so generic
+  `CROSS_COMPILE=<prefix>-` build scripts work out of the box.
+- `llvm-bolt` suite (bolt, boltdiff, heatmap, binary-analysis,
+  merge-fdata, perf2bolt) for post-link optimization.
+- `clang-repl` — interactive C++ interpreter
+  (https://clang.llvm.org/docs/ClangRepl.html).
+- Full binutils set: `llvm-ar/nm/objcopy/objdump/readelf/readobj/strip/
+  addr2line/size/strings/symbolizer`, plus `clang-format`.
+- Bundled GCC 4.9 pair (`aarch64-linux-android-4.9/`,
+  `arm-linux-androideabi-4.9/`) — the proven combo for 4.14 kernel
+  builds (64-bit via clang, 32-bit compat via `CROSS_COMPILE_ARM32`).
+  `setup-env.sh` exports `CLANG_DIR`, `GCC64_DIR`, `GCC32_DIR`.
+
 ## Tested
 
 `miatoll` (sm6250, 4.14.369) full `Image.gz` build — OK.
