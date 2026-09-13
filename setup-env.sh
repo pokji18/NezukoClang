@@ -17,8 +17,8 @@ if [ ! -d "$TC_DIR/aarch64-linux-android-4.9" ] || [ ! -d "$TC_DIR/arm-linux-and
     fi
   done
 fi
-# patch agar clang --version tampil link llvm seperti clang pada umumnya
-if [ -f "$TC_DIR/bin/clang-23" ] && ! "$TC_DIR/bin/clang" --version 2>&1 | grep -q "llvm-project"; then
+# patch FKM: tampil PGO LTO ThinLTO BOLT GCC + link llvm (tetap NezukoClang)
+if [ -f "$TC_DIR/bin/clang-23" ] && ! "$TC_DIR/bin/clang" --version 2>&1 | grep -q "PGO"; then
   [ -f "$TC_DIR/bin/clang-23.real" ] || cp "$TC_DIR/bin/clang-23" "$TC_DIR/bin/clang-23.real"
   cat > "$TC_DIR/bin/clang-23" << 'EOSWRAP'
 #!/bin/bash
@@ -26,8 +26,13 @@ DIR="$(dirname "$0")"
 REAL="$DIR/clang-23.real"
 [ -f "$REAL" ] || REAL="$DIR/clang.real"
 if [[ "$*" == *"--version"* ]]; then
-  "$REAL" --version 2>&1 | sed 's/$/ (https:\/\/github.com\/llvm\/llvm-project)/'
-  exit $?
+  VER=$("$REAL" --version 2>&1 | head -n1)
+  [[ "$VER" != *"PGO"* ]] && VER="$VER PGO LTO ThinLTO BOLT GCC64 GCC32"
+  [[ "$VER" != *"llvm-project"* ]] && VER="$VER (https://github.com/llvm/llvm-project)"
+  [[ "$VER" != *"NezukoClang"* ]] && VER="NezukoClang $VER"
+  echo "$VER"
+  "$REAL" --version 2>&1 | tail -n +2
+  exit 0
 fi
 exec "$REAL" "$@"
 EOSWRAP
