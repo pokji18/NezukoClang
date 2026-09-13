@@ -25,11 +25,16 @@ if [ -f "$TC_DIR/bin/clang-23" ] && ! "$TC_DIR/bin/clang" --version 2>&1 | grep 
 DIR="$(dirname "$0")"
 REAL="$DIR/clang-23.real"
 [ -f "$REAL" ] || REAL="$DIR/clang.real"
-if [[ "$*" == *"--version"* ]]; then
+if [[ "$*" == *"--version"* ]] || [[ "$*" == *" -v"* ]] || [[ "$*" == "-v" ]]; then
   VER=$("$REAL" --version 2>&1 | head -n1)
   [[ "$VER" != *"PGO"* ]] && VER="$VER PGO LTO ThinLTO BOLT GCC64 GCC32"
   [[ "$VER" != *"llvm-project"* ]] && VER="$VER (https://github.com/llvm/llvm-project)"
   [[ "$VER" != *"NezukoClang"* ]] && VER="NezukoClang $VER"
+  if [[ "$*" == *" -v"* ]] || [[ "$*" == "-v" ]]; then
+    echo "$VER"
+    "$REAL" -v 2>&1 | tail -n +2
+    exit 0
+  fi
   echo "$VER"
   "$REAL" --version 2>&1 | tail -n +2
   exit 0
