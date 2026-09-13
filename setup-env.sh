@@ -2,6 +2,21 @@
 # NezukoClang env setup — source this file:
 #   source /path/to/NezukoClang/setup-env.sh
 TC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# auto-fetch GCC 64/32 jika belum ada (biar full saat clone)
+if [ ! -d "$TC_DIR/aarch64-linux-android-4.9" ] || [ ! -d "$TC_DIR/arm-linux-androideabi-4.9" ]; then
+  echo "GCC 64/32 belum ada — fetch ..."
+  for gcc in aarch64-linux-android-4.9 arm-linux-androideabi-4.9; do
+    if [ ! -d "$TC_DIR/$gcc" ]; then
+      # coba ambil dari serverhive cache jika ada, else clone minimal
+      if [ -d "/serverhive1/nezuko330/clang/NezukoClang/$gcc" ]; then
+        cp -a "/serverhive1/nezuko330/clang/NezukoClang/$gcc" "$TC_DIR/$gcc" 2>/dev/null && echo "  $gcc dari cache"
+      else
+        echo "  clone $gcc ..."
+        git clone --depth 1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/$gcc "$TC_DIR/$gcc" 2>&1 | tail -n1 || echo "  gagal clone $gcc — manual download needed"
+      fi
+    fi
+  done
+fi
 # patch agar clang --version tampil link llvm seperti clang pada umumnya
 if [ -f "$TC_DIR/bin/clang-23" ] && ! "$TC_DIR/bin/clang" --version 2>&1 | grep -q "llvm-project"; then
   [ -f "$TC_DIR/bin/clang-23.real" ] || cp "$TC_DIR/bin/clang-23" "$TC_DIR/bin/clang-23.real"
