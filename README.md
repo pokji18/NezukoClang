@@ -1,7 +1,7 @@
 # NezukoClang — clang 23.1.1 for Android kernel builds
 
 ```
-NezukoClang clang version 23.1.1
+clang version 23.1.1 (https://github.com/llvm/llvm-project)
 Target: x86_64-unknown-linux-gnu
 ```
 

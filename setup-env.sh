@@ -2,6 +2,22 @@
 # NezukoClang env setup — source this file:
 #   source /path/to/NezukoClang/setup-env.sh
 TC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# patch agar clang --version tampil link llvm seperti clang pada umumnya
+if [ -f "$TC_DIR/bin/clang-23" ] && ! "$TC_DIR/bin/clang" --version 2>&1 | grep -q "llvm-project"; then
+  [ -f "$TC_DIR/bin/clang-23.real" ] || cp "$TC_DIR/bin/clang-23" "$TC_DIR/bin/clang-23.real"
+  cat > "$TC_DIR/bin/clang-23" << 'EOSWRAP'
+#!/bin/bash
+DIR="$(dirname "$0")"
+REAL="$DIR/clang-23.real"
+[ -f "$REAL" ] || REAL="$DIR/clang.real"
+if [[ "$*" == *"--version"* ]]; then
+  "$REAL" --version 2>&1 | sed 's/NezukoClang clang version/clang version/; s/$/ (https:\/\/github.com\/llvm\/llvm-project)/'
+  exit $?
+fi
+exec "$REAL" "$@"
+EOSWRAP
+  chmod +x "$TC_DIR/bin/clang-23"
+fi
 export PATH="$TC_DIR/bin:$TC_DIR/aarch64-linux-android-4.9/bin:$TC_DIR/arm-linux-androideabi-4.9/bin:$PATH"
 export CLANG_DIR="$TC_DIR"
 export GCC64_DIR="$TC_DIR/aarch64-linux-android-4.9"
